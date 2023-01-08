@@ -8,9 +8,19 @@
   <title>Log in with your account</title>
   <link rel="stylesheet" type="text/css" href="${contextPath}/resources/css/style.css">
 </head>
-
+<style>
+  body {
+    background: url("https://pcvector.net/uploads/posts/2018-02/1517572511_bg-svg-gradient-min.png");
+    background-size: 100%;
+  }
+</style>
 <body>
-<div>
+<div class="navbar">
+  <div>
+    <a href="/">Главная</a>
+  </div>
+</div>
+<div class="table1">
   <table>
     <thead>
     <th>ID</th>
@@ -30,15 +40,14 @@
           <form action="${pageContext.request.contextPath}/admin" method="post">
             <input type="hidden" name="userId" value="${user.id}"/>
             <input type="hidden" name="action" value="delete"/>
-            <button type="submit">Delete</button>
+            <button type="submit" class="btnq">Delete</button>
           </form>
 
         </td>
-
       </tr>
     </c:forEach>
   </table>
-  <a href="/">Главная</a>
 </div>
+
 </body>
 </html>
