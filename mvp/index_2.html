@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Three.js CSV Points</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+var sphere_radius = getURLVar('sphere_radius');
+var dict_name = getURLVar('dict_name');
+var spliter = getURLVar("spliter"); 
+console.log(spliter);
+ 
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      camera.position.set(0, 0, 10);
+      controls.update();
+      
+      const csvFilePath = dict_name + ".csv";
+      const loader = new THREE.FileLoader();
+      loader.load(
+        csvFilePath,
+        function (csvString) {
+          const pointsArray = csvString.split("\n");
+          const pointGeometry = new THREE.SphereGeometry(sphere_radius, 16, 16);
+          const pointMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+          });
+
+          pointsArray.forEach(function (pointString) {
+            const [x, y, z] = pointString.split(spliter);
+            const point = new THREE.Mesh(pointGeometry, pointMaterial);
+            point.position.set(x, y, z);
+            scene.add(point);
+          });
+        },
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        function (error) {
+          console.error("Error loading file", error);
+        }
+      );
+
+      const animate = function () {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      };
+
+      animate();
+
+      window.addEventListener("resize", function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+
+      function getURLVar(key) {
+          var vars = location.search.substr(1).split('&').reduce(function(res, a) {
+            var t = a.split('=');
+            res[decodeURIComponent(t[0])] = t.length == 1 ? null : decodeURIComponent(t[1]);
+            return res;
+          }, {});
+          return vars[key] ? vars[key] : '';
+          }
+    </script>
+  </body>
+</html>
