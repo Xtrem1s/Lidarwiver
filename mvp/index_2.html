@@ -10,6 +10,14 @@
         margin: 0;
         overflow: hidden;
       }
+      #footer{
+        position: fixed; /* Фиксированное положение */
+    left: 0; bottom: 0; /* Левый нижний угол */
+    padding: 10px; /* Поля вокруг текста */
+    background: #39b54a; /* Цвет фона */
+    color: #fff; /* Цвет текста */
+    width: 100%; /* Ширина слоя */
+      }
     </style>
   </head>
   <body>
@@ -21,14 +29,18 @@ var sphere_radius = getURLVar('sphere_radius');
 var dict_name = getURLVar('dict_name');
 var spliter = getURLVar("spliter"); 
 console.log(spliter);
- 
-      const scene = new THREE.Scene();
+const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
+      var wights_segments = 16;
+      var height_segments = 16;
+      var sphere_color = '#FF0000';
+draw_scene();
+ function draw_scene(){
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
@@ -44,9 +56,9 @@ console.log(spliter);
         csvFilePath,
         function (csvString) {
           const pointsArray = csvString.split("\n");
-          const pointGeometry = new THREE.SphereGeometry(sphere_radius, 16, 16);
+          const pointGeometry = new THREE.SphereGeometry(sphere_radius, wights_segments, height_segments);
           const pointMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
+            color: sphere_color,
           });
 
           pointsArray.forEach(function (pointString) {
@@ -63,7 +75,7 @@ console.log(spliter);
           console.error("Error loading file", error);
         }
       );
-
+        
       const animate = function () {
         requestAnimationFrame(animate);
         controls.update();
@@ -77,7 +89,20 @@ console.log(spliter);
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
+    }
+      function clear_scene(){
+        while(scene.children.length > 0){ 
+    scene.remove(scene.children[0]); }
+      }
+      function change_scene(){
+        clear_scene();
+        sphere_radius = document.getElementById('sphere_rad').value;
+        wights_segments = document.getElementById('wights_segments').value;
+        height_segments = document.getElementById('height_segments').value;
+        sphere_color = document.getElementById('sphere_color').value;
+        draw_scene();
 
+      }
 
       function getURLVar(key) {
           var vars = location.search.substr(1).split('&').reduce(function(res, a) {
@@ -88,5 +113,14 @@ console.log(spliter);
           return vars[key] ? vars[key] : '';
           }
     </script>
+    <div id="footer">
+      Радиус сфер = <input id="sphere_rad" type="number" size="3" name="num" min="0.1" max="10" value="0.1" step="0.1">
+       Количество горизонтальных сегментов = <input id="wights_segments" type="number" size="3" name="num" min="1" max="100" step="1">
+       Колчество вертикальных сегментов =<input id="height_segments" type="number" size="3" name="num" min="1" max="100" step="1">
+       <input type="color" id="sphere_color" value="#e66465">
+       <script>document.getElementById('wights_segments').value = wights_segments;
+      document.getElementById('height_segments').value = height_segments;</script>
+      <button type="submit" id="submit" onclick="change_scene();">Изменить</button>
+    </div>
   </body>
 </html>
